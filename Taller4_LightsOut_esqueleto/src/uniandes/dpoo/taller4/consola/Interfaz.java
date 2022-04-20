@@ -12,10 +12,14 @@ import java.awt.Color;
 import javax.swing.JComboBox;
 import java.awt.FlowLayout;
 import javax.swing.DropMode;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.JRadioButton;
 import javax.swing.JButton;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -25,6 +29,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -101,8 +106,22 @@ public class Interfaz {
 			public void actionPerformed(ActionEvent e) {
 				int indice = Tamanio.getSelectedIndex();
 				String tam = (String) Tamanio.getModel().getElementAt(indice);
-				JOptionPane.showMessageDialog(null, "El tamaño será "+ tam);
+				int num = Integer.parseInt((String.valueOf(tam.charAt(0))));
+				panel_3.removeAll();
+				panel_3.setLayout(new GridLayout(num, num, 0, 0));
+				for(int i=0;i<num*num;i++){
+					JPanel panel=new JPanel();  ///se asigna un color.
+					PanelLienzo pa = new PanelLienzo();
+					panel.add(pa);
+					pa.setVisible(true);
+					Border borde;
+					borde = BorderFactory.createLineBorder(Color.black);  ///se le pone un borde.
+					panel.setBorder(borde);
+					panel_3.add(panel); ///Se agrega el panel a la cuadricula una vez que tiene color y borde.
+						}
+				
 			}
+			
 		});
 		Tamanio.setModel(new DefaultComboBoxModel(new String[] {"2x2", "3x3", "4x4", "5x5", "6x6", "7x7"}));
 		panel.add(Tamanio);
@@ -199,7 +218,8 @@ public class Interfaz {
 		
 		panel_3 = new JPanel();
 		frmLightsout.getContentPane().add(panel_3, BorderLayout.CENTER);
-		panel_3.setLayout(new GridLayout(1, 0, 0, 0));
+		panel_3.setLayout(new GridLayout(2, 2, 0, 0));
+		
 		
 		
 	}
