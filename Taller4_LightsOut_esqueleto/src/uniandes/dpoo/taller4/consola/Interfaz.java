@@ -28,6 +28,9 @@ import java.awt.Component;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
+
+import uniandes.dpoo.taller4.modelo.Tablero;
+
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
@@ -38,13 +41,17 @@ import javax.swing.DefaultComboBoxModel;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
+import javax.swing.SpringLayout;
 
 public class Interfaz {
 
 	private JFrame frmLightsout;
 	private JPanel panel_1;
 	private JLabel lblNewLabel;
-	private JComboBox Tamanio;
 	private JLabel lblNewLabel_1;
 	private JRadioButton rdbtnNewRadioButton;
 	private JRadioButton rdbtnNewRadioButton_1;
@@ -53,16 +60,27 @@ public class Interfaz {
 	private JTextField textField;
 	private JTextField textField_1;
 	private JPanel panel_3;
+	private JPanel panel_4;
+	private JTextField textField_2;
 
+	private Tablero tablero = new Tablero(5);
+	private JComboBox comboBox;
 	/**
 	 * Launch the application.
 	 */
+	
+	
+	
 	public static void main(String[] args) {
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Interfaz window = new Interfaz();
-					window.frmLightsout.setVisible(true);
+					
+						Interfaz window = new Interfaz();
+						window.frmLightsout.setVisible(true);
+					
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -74,6 +92,7 @@ public class Interfaz {
 	 * Create the application.
 	 */
 	public Interfaz() {
+		
 		initialize();
 	}
 
@@ -101,36 +120,31 @@ public class Interfaz {
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		panel.add(lblNewLabel);
 		
-		Tamanio = new JComboBox();
-		Tamanio.addActionListener(new ActionListener() {
+		comboBox = new JComboBox();
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"3x3", "4x4", "5x5", "6x6", "7x7"}));
+		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int indice = Tamanio.getSelectedIndex();
-				String tam = (String) Tamanio.getModel().getElementAt(indice);
-				int num = Integer.parseInt((String.valueOf(tam.charAt(0))));
-				panel_3.removeAll();
-				panel_3.setLayout(new GridLayout(num, num, 0, 0));
-				for(int i=0;i<num*num;i++){
-					JPanel panel=new JPanel();  ///se asigna un color.
-					PanelLienzo pa = new PanelLienzo();
-					panel.add(pa);
-					pa.setVisible(true);
-					Border borde;
-					borde = BorderFactory.createLineBorder(Color.black);  ///se le pone un borde.
-					panel.setBorder(borde);
-					panel_3.add(panel); ///Se agrega el panel a la cuadricula una vez que tiene color y borde.
-						}
-				
+				int indice = comboBox.getSelectedIndex();
+                String tam = (String) comboBox.getModel().getElementAt(indice);
+                int num = Integer.parseInt((String.valueOf(tam.charAt(0))));
+                tablero = new Tablero(num);
+                panel_3.setLayout(new GridLayout(num, num, 0, 0));
+                dibujarTablero();
 			}
-			
 		});
-		Tamanio.setModel(new DefaultComboBoxModel(new String[] {"2x2", "3x3", "4x4", "5x5", "6x6", "7x7"}));
-		panel.add(Tamanio);
+		panel.add(comboBox);
 		
 		lblNewLabel_1 = new JLabel("Dificultad: ");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		panel.add(lblNewLabel_1);
 		
 		rdbtnNewRadioButton = new JRadioButton("F\u00E1cil");
+		rdbtnNewRadioButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tablero.desordenar(5);
+				dibujarTablero();
+			}
+		});
 		rdbtnNewRadioButton.setBackground(new Color(51, 102, 153));
 		panel.add(rdbtnNewRadioButton);
 		
@@ -168,20 +182,16 @@ public class Interfaz {
 		GridBagLayout gbl_panel_2 = new GridBagLayout();
 		gbl_panel_2.columnWidths = new int[]{115, 0};
 		gbl_panel_2.rowHeights = new int[]{127, 127, 127, 127, 0};
-		gbl_panel_2.columnWeights = new double[]{0.0, Double.MIN_VALUE};
-		gbl_panel_2.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_2.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_panel_2.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		panel_2.setLayout(gbl_panel_2);
-		
-		JButton btnNewButton_3 = new JButton("Cambiar Jugador");
-		btnNewButton_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
 		
 		JButton btnNewButton = new JButton("Nuevo");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				tablero.desordenar(5);
+				dibujarTablero();
+			
 			}
 		});
 		btnNewButton.setBackground(new Color(102, 204, 255));
@@ -209,16 +219,33 @@ public class Interfaz {
 		gbc_btnNewButton_2.gridx = 0;
 		gbc_btnNewButton_2.gridy = 2;
 		panel_2.add(btnNewButton_2, gbc_btnNewButton_2);
+		
+		panel_4 = new JPanel();
+		GridBagConstraints gbc_panel_4 = new GridBagConstraints();
+		gbc_panel_4.fill = GridBagConstraints.BOTH;
+		gbc_panel_4.gridx = 0;
+		gbc_panel_4.gridy = 3;
+		panel_2.add(panel_4, gbc_panel_4);
+		SpringLayout sl_panel_4 = new SpringLayout();
+		panel_4.setLayout(sl_panel_4);
+		
+		JButton btnNewButton_3 = new JButton("Cambiar Jugador");
 		btnNewButton_3.setBackground(new Color(102, 204, 255));
-		GridBagConstraints gbc_btnNewButton_3 = new GridBagConstraints();
-		gbc_btnNewButton_3.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnNewButton_3.gridx = 0;
-		gbc_btnNewButton_3.gridy = 3;
-		panel_2.add(btnNewButton_3, gbc_btnNewButton_3);
+		sl_panel_4.putConstraint(SpringLayout.NORTH, btnNewButton_3, 31, SpringLayout.NORTH, panel_4);
+		sl_panel_4.putConstraint(SpringLayout.WEST, btnNewButton_3, 0, SpringLayout.WEST, panel_4);
+		sl_panel_4.putConstraint(SpringLayout.EAST, btnNewButton_3, 0, SpringLayout.EAST, panel_4);
+		panel_4.add(btnNewButton_3);
+		
+		textField_2 = new JTextField();
+		sl_panel_4.putConstraint(SpringLayout.NORTH, textField_2, 18, SpringLayout.SOUTH, btnNewButton_3);
+		sl_panel_4.putConstraint(SpringLayout.EAST, textField_2, -9, SpringLayout.EAST, panel_4);
+		panel_4.add(textField_2);
+		textField_2.setColumns(10);
 		
 		panel_3 = new JPanel();
 		frmLightsout.getContentPane().add(panel_3, BorderLayout.CENTER);
-		panel_3.setLayout(new GridLayout(2, 2, 0, 0));
+		panel_3.setLayout(new GridLayout(5, 5, 0, 0));
+		dibujarTablero();
 		
 		
 		
@@ -238,5 +265,35 @@ public class Interfaz {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public void dibujarTablero() {
+		panel_3.removeAll();
+		boolean [][] tablerop = tablero.darTablero();
+		for (int i = 0; i < tablerop.length; i++)
+			for (int ii = 0; ii < tablerop.length; ii++)
+			{
+				if (tablerop[i][ii] == true)
+					{
+					PanelLienzo pa = new PanelLienzo();
+                    Border borde;
+                    borde = BorderFactory.createLineBorder(Color.black);  ///se le pone un borde.
+                    pa.setBorder(borde);
+                    panel_3.add(pa); ///Se agrega el panel a la cuadricula una vez que tiene color y borde.
+                    pa.setSize(100, 200);
+                    pa.setVisible(true);
+					}
+				else {
+					
+					JPanel panel=new JPanel();
+					panel.setBackground(Color.black);  ///se asigna un color.
+					Border borde;
+					borde = BorderFactory.createLineBorder(Color.black);  ///se le pone un borde.
+					panel.setBorder(borde);
+                    panel_3.add(panel); ///Se agrega el panel a la cuadricula una vez que tiene color y borde.
+                    
+				}
+			}
+		panel_3.setVisible(true);
 	}
 }

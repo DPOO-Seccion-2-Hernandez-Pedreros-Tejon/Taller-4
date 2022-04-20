@@ -5,15 +5,20 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 
-public class PanelLienzo extends JComponent
+public class PanelLienzo extends JPanel
 {
-	public void Paint(Graphics g)
-	{
-		super.paint(g);
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setStroke(new BasicStroke(2f));
+    PanelLienzo() {
+        //setBackground(Color.white);
+        }
+    public void paint(Graphics g)
+    {
+        super.paint(g);
+        Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.RED);
-        g2d.fill(new Rectangle2D.Double(0, 0, 100, 100));
-	}
+        //Rectangle2D.Double rectangulo = new Rectangle2D.Double(0, 0, 100, 100);
+        //g2d.draw(rectangulo);
+        g2d.fillRect(0, 0, 100, 100);
+    }
 }
